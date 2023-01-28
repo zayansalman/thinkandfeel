@@ -3,5 +3,6 @@ pandas
 geopy
 plotly
 country-converter
+numpy
 matplotlib
 openpyxl

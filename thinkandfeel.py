@@ -3,6 +3,7 @@ import pandas as pd
 from geopy.geocoders import Nominatim
 import plotly.express as px
 import country_converter as coco
+import numpy as np
 cc = coco.CountryConverter()
 
 geolocator = Nominatim(user_agent="geoapiExercises")
@@ -33,14 +34,25 @@ for index, row in tnf_ce_df.iterrows():
 # Add the coordinates as new columns in the dataframe
 tnf_ce_df['latitude'] = [x[0] for x in coordinates]
 tnf_ce_df['longitude'] = [x[1] for x in coordinates]
+tnf_ce_df['log_plays'] = np.log10(tnf_ce_df['Quantity'])
 
-fig = px.scatter_geo(tnf_ce_df, locations='iso_a3', locationmode='ISO-3',
-                     color='Quantity', hover_name='iso_a3', size='Quantity',
-                     title='Value by country',
-                     projection='natural earth')
+fig = px.choropleth(tnf_ce_df, locations='iso_a3',
+                    locationmode='ISO-3',
+                    color='log_plays',
+                    hover_name="iso_a3",
+                    hover_data=['Quantity', 'Earnings (USD)'],
+                    color_continuous_scale='ylgn',
+                    # range_color=(0, total_quantity * 2),
+                    # title='Plays by Country',
+                    width=1000, height=800,
+                    labels={'Quantity': 'Plays', 'log_plays': 'Plays(log-scaled)'},
+                    projection='natural earth')
 
+fig.update_layout(autosize=True, geo=dict(bgcolor='rgba(0,0,0,0)'), showlegend=False)
+
+st.set_page_config(page_title="think and feel", page_icon=None, layout="centered")
 st.title("think and feel")
 st.write('Analytics as of ' + str(reporting_date.date()))
-st.write('Total Plays:  ' + str(total_quantity))
-st.write('Total Earnings: $' + str(round(total_earnings)))
+st.metric(label='Total Plays:', value=str(total_quantity))
+st.metric(label='Total Earnings:', value='$' + str(round(total_earnings)))
 st.plotly_chart(fig)
