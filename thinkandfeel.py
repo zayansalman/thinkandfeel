@@ -4,7 +4,6 @@ from geopy.geocoders import Nominatim
 import plotly.express as px
 import country_converter as coco
 import numpy as np
-import matplotlib.pyplot as plt
 cc = coco.CountryConverter()
 
 geolocator = Nominatim(user_agent="geoapiExercises")
@@ -46,14 +45,14 @@ top10_df = top10_df.sort_index(ascending=True)
 
 countries = top10_df['iso_a3'].unique()
 
-for country in countries:
-    plays = top10_df[top10_df['iso_a3'] == country]
-    plt.scatter(plays.index, np.log(plays['Quantity']), label=country)
+us = top10_df.loc[top10_df['Country of Sale'] == 'US']
+au = top10_df.loc[top10_df['Country of Sale'] == 'AU']
+es = top10_df.loc[top10_df['Country of Sale'] == 'ES']
+gb = top10_df.loc[top10_df['Country of Sale'] == 'GB']
+de = top10_df.loc[top10_df['Country of Sale'] == 'DE']
 
-plt.title('Top 5 Countries')
-plt.xlabel('Reporting Date')
-plt.ylabel('Log scaled Plays')
-plt.legend()
+plays_fig = px.scatter(top10_df, x=top10_df.index, y='Quantity', color='iso_a3')
+
 
 fig = px.choropleth(tnf_ce_df, locations='iso_a3',
                     locationmode='ISO-3',
@@ -78,6 +77,5 @@ with col1:
     st.metric(label='Total Plays:', value=str(total_quantity))
     st.metric(label='Total Earnings:', value='$' + str(round(total_earnings)))
 with col2:
-    st.set_option('deprecation.showPyplotGlobalUse', False)
-    st.pyplot()
+    st.plotly_chart(plays_fig)
 st.plotly_chart(fig)
