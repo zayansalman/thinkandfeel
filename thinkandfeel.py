@@ -43,16 +43,7 @@ top10_df = tnf_df[tnf_df['iso_a3'].isin(top10_countries)]
 top10_df = top10_df.set_index('Reporting Date')
 top10_df = top10_df.sort_index(ascending=True)
 
-countries = top10_df['iso_a3'].unique()
-
-us = top10_df.loc[top10_df['Country of Sale'] == 'US']
-au = top10_df.loc[top10_df['Country of Sale'] == 'AU']
-es = top10_df.loc[top10_df['Country of Sale'] == 'ES']
-gb = top10_df.loc[top10_df['Country of Sale'] == 'GB']
-de = top10_df.loc[top10_df['Country of Sale'] == 'DE']
-
 plays_fig = px.scatter(top10_df, x=top10_df.index, y='Quantity', color='iso_a3')
-
 
 fig = px.choropleth(tnf_ce_df, locations='iso_a3',
                     locationmode='ISO-3',
@@ -68,14 +59,24 @@ fig = px.choropleth(tnf_ce_df, locations='iso_a3',
 
 fig.update_layout(autosize=True, geo=dict(bgcolor='rgba(0,0,0,0)'), showlegend=False)
 
-st.set_page_config(page_title="think and feel", page_icon=None, layout="centered")
+st.set_page_config(page_title="think and feel", page_icon=None)
+
 st.title("think and feel")
 st.write('Analytics as of ' + str(reporting_date.date()))
-col1, col2 = st.columns(2)
+st.metric(label='Total Plays:', value=str(total_quantity))
+st.metric(label='Total Earnings:', value='$' + str(round(total_earnings)))
 
-with col1:
-    st.metric(label='Total Plays:', value=str(total_quantity))
-    st.metric(label='Total Earnings:', value='$' + str(round(total_earnings)))
-with col2:
-    st.plotly_chart(plays_fig)
-st.plotly_chart(fig)
+st.subheader('World map visualising plays')
+st.plotly_chart(fig, use_container_width=True)
+
+col3, col4 = st.columns(2)
+
+with col3:
+    country_option = st.selectbox('Select a country', tnf_df['iso_a3'].unique())
+    cpdf = tnf_df.loc[tnf_df['iso_a3'] == country_option]
+    st.subheader('Plays by platform by country')
+    platform_fig = px.pie(cpdf, values='Quantity', names='Store')
+    st.plotly_chart(platform_fig, use_container_width=True)
+with col4:
+    st.subheader('Plays by top 5 countries over time')
+    st.plotly_chart(plays_fig, use_container_width=True)
