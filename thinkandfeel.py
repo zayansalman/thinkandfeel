@@ -62,6 +62,7 @@ fig.update_layout(autosize=True, geo=dict(bgcolor='rgba(0,0,0,0)'), showlegend=F
 st.set_page_config(page_title="think and feel", page_icon=None)
 
 st.title("think and feel")
+st.subheader("[>streaming links<](https://distrokid.com/hyperfollow/zayankhan/think--feel)")
 st.write('Analytics as of ' + str(reporting_date.date()))
 st.metric(label='Total Plays:', value=str(total_quantity))
 st.metric(label='Total Earnings:', value='$' + str(round(total_earnings)))
